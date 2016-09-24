@@ -26,7 +26,6 @@ for row in csvreaderPopulacao:
 # Calcular media e desvio da populacao
 mediaPopulacao        = np.mean(np.array(tempoPopulacao))
 desvioPadraoPopulacao = math.sqrt(np.var(np.array(tempoPopulacao)))	
-tamanhoPopulacao      = len(tempoPopulacao)
 
 # Lendo arquivo csv da amostra
 tempoAmostra     = []
@@ -40,13 +39,12 @@ for row in csvreaderAmostra:
 	tempoAmostra.append(float(row[1]))
 
 numeroDeAmostras = len(tempoAmostra)
-
-mediaAmostra = np.mean(np.array(tempoAmostra))
+mediaAmostra     = np.mean(np.array(tempoAmostra))
 
 # Teste de Hipotese (Bicaudal)
 alfa = 0.05
 
-z = (mediaAmostra - mediaPopulacao)/ (desvioPadraoPopulacao / math.sqrt(tamanhoPopulacao))
+z = (mediaAmostra - mediaPopulacao)/ (desvioPadraoPopulacao / math.sqrt(numeroDeAmostras))
 
 # ponto critico: P[Z > z]
 pValor = 0
@@ -61,4 +59,4 @@ if (pValor < alfa/2):
 	else:
 		print("Rejeita a New Feature - Rejeita H0")
 else:
-	print ("Nao Rejeita H0")
+	print ("Nao Rejeita H0 e Rejeita a New Feature")
