@@ -45,13 +45,17 @@ mediaAmostra     = np.mean(np.array(tempoAmostra))
 alfa = 0.05
 
 z = (mediaAmostra - mediaPopulacao)/ (desvioPadraoPopulacao / math.sqrt(numeroDeAmostras))
+print (z)
 
+print(stats.norm.cdf(z))
 # ponto critico: P[Z > z]
 pValor = 0
 if (z > 0):
 	pValor = 1 - stats.norm.cdf(z)
 else:
 	pValor = stats.norm.cdf(z)
+
+print (pValor)
 
 if (pValor < alfa/2):
 	if (z > 0):

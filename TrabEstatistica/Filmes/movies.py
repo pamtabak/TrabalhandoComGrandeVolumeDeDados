@@ -23,3 +23,7 @@ for row in csvReader:
 		#Garantindo que os dados (com os quais queremos trabalhar) estao preenchidos
 		faceNumber.append(float(row[15]))
 		imdbScore.append(float(row[25]))
+
+#Checando a correlacao entre as duas variaveis
+correlation = stats.pearsonr(faceNumber, imdbScore)
+print(correlation)		
