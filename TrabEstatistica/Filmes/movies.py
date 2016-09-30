@@ -26,4 +26,4 @@ for row in csvReader:
 
 #Checando a correlacao entre as duas variaveis
 correlation = stats.pearsonr(faceNumber, imdbScore)
-print(correlation)		
+print(correlation)
