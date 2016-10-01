@@ -9,21 +9,51 @@ import csv
 csvFile   = open('movie_metadata.csv', 'rb')
 csvReader = csv.reader(csvFile, delimiter=',')
 
-# Tirando o cabecalho
-csvReader.next()
+#Tentando descobrir a melhor correlacao entre imdbScore e outra variavel
+#de modo a ajudar o produtor
 
-#facenumber_in_poster = index 15
-#imdb_score           = index 25
+headers   = [] #array com o cabecalho
+atributos = [] #array de dimensao 2, com 28 (numero de campos) posicoes. Cada array interno tera o numero de linhas do dataset - 1 (remove o cabecalho)
 
-faceNumber = []
-imdbScore  = []
+#Indices numericos
+indices=[2,3,4,5,7,8,12,13,15,18,22,23,24,25,26,27]
+
+#28 atributos
+row = csvReader.next()
+for x in indices:
+	headers.append(row[x])
+	cadaAtributo = []
+	atributos.append(cadaAtributo)
 
 for row in csvReader:
-	if (row[15] != '' and row[25] != ''):
-		#Garantindo que os dados (com os quais queremos trabalhar) estao preenchidos
-		faceNumber.append(float(row[15]))
-		imdbScore.append(float(row[25]))
+	linhaEstaCompleta = True
+	for x in indices:
+		if (row[x] == ''):
+			linhaEstaCompleta = False
+			break
+	if (linhaEstaCompleta):
+		for x in indices:
+			atributos[indices.index(x)].append(row[x])
 
-#Checando a correlacao entre as duas variaveis
-correlation = stats.pearsonr(faceNumber, imdbScore)
-print(correlation)
+#Calculando a correlacao entre imdb_score e facenumber_in_poster
+faceNumber = np.array(atributos[indices.index(15)]).astype(np.float)
+imdbScore  = np.array(atributos[indices.index(25)]).astype(np.float)
+
+correlacao = stats.pearsonr(faceNumber, imdbScore)
+print("Correlacao entre imdb_score e facenumber_in_poster = " + str(correlacao))
+
+#Calculando a correlacao entre imdb_score e outra variavel numerica
+maiorCorrelacao = 0
+indiceMaiorCorrelacao = 0
+
+for x in indices:
+	if x == 25: #propria variavel imdb_score
+		continue
+	correlacao = stats.pearsonr(np.array(atributos[indices.index(x)]).astype(np.float), imdbScore)
+	if (correlacao > maiorCorrelacao):
+		maiorCorrelacao = correlacao
+		indiceMaiorCorrelacao = x
+
+print("A maior correlacao encontrada para imdb_score com alguma variavel (numerica) = " + str(maiorCorrelacao[0]) + ". Variavel = " + headers[indices.index(x)])
+
+
