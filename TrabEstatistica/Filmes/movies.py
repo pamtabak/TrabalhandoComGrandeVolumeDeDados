@@ -53,7 +53,8 @@ for x in indices:
 	if (correlacao > maiorCorrelacao):
 		maiorCorrelacao = correlacao
 		indiceMaiorCorrelacao = x
+	print(str(correlacao[0]) + " " + headers[indices.index(x)])
 
-print("A maior correlacao encontrada para imdb_score com alguma variavel (numerica) = " + str(maiorCorrelacao[0]) + ". Variavel = " + headers[indices.index(x)])
+print("A maior correlacao encontrada para imdb_score com alguma variavel (numerica) = " + str(maiorCorrelacao[0]) + ". Variavel = " + headers[indices.index(indiceMaiorCorrelacao)])
 
 

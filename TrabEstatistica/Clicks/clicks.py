@@ -53,6 +53,7 @@ numeroDeGrausDeLiberdade = 4
 alfa = 0.05
 pvalue = 1 - stats.chi2.cdf(xn, numeroDeGrausDeLiberdade) #1 - acumulada ate o ponto xn
 print (pvalue)
+print(xn)
 
 if pvalue > alfa:
 	print ("Nao rejeita H0. Popup nao faz diferenca")
