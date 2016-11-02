@@ -30,7 +30,6 @@ for row in csvReader:
 
 # Checking what we can do with each column
 # 1. If there is any column that doesn`t make any difference (for instance, all the records are filled with the same value)
-col = 0
 for column in dataset:
 	allElementsEqual = True
 	value = column[0]
@@ -39,7 +38,5 @@ for column in dataset:
 			allElementsEqual = False
 			break
 	if (allElementsEqual):
-		header.remove(header[col])
 		dataset.remove(column)
-	col += 1
 
