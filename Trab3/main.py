@@ -43,6 +43,7 @@ for column in trainingDataset:
 			break
 	if (allElementsEqual):
 		trainingDataset.remove(column)
+        testingDataset.remove(column)
 
 
 #2. If there are any 2 columns correlated
@@ -56,3 +57,7 @@ for column1 in trainingDataset:
 			if (math.fabs(correlation) + eps >= 1):
 				print(len(trainingDataset))
 				trainingDataset.remove(column2)
+                testingDataset.remove(column2)
+# salvar dataset sem correlacao em um novo csv (salvar tambem o de teste)
+# rodar processo de classificacao nos dois datasets com um cross-validation com k pelo menos 50
+# ver se melhorou
