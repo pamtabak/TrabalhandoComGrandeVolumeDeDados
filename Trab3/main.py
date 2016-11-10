@@ -52,19 +52,27 @@ for index1 in xrange(len(trainingDataset)):
                         columnsToRemove.append(trainingDataset[index2])
     print(index1)
 
-# 2. If there is any column that doesn`t make any difference (for instance, all the records are filled with the same value)
-#3. If there are any columns that are "indexes"
-
-# for column in trainingDataset:
-#         size = len(set(column))
-#         print(size)
-#         if (len(set(column)) < 2 and trainingDataset.index(column) != len(trainingDataset) -1 ):
-#                 columnsToRemove.append(column)
+#2. If there are any columns that are "indexes"
+hashingTrickColumns = []
+# Hashing Trick (look for columns that have less than 50 unique values on it)
+uniqueValues = 50
+for column in trainingDataset:
+        # We need to be sure we won`t remove the TARGET column
+        if (len(set(column)) < uniqueValues and trainingDataset.index(column) != len(trainingDataset) - 1):
+            hashingTrickColumns.append(column)
 
 for column in columnsToRemove:
-        index = trainingDataset.index(column)
-        trainingDataset.remove(column)
-        del testingDataset[index]
+    index = trainingDataset.index(column)
+    trainingDataset.remove(column)
+    del testingDataset[index]
+
+for column in hashingTrickColumns:
+    index = trainingDataset.index(column)
+    trainingDataset.remove(column)
+    testingColumn = testingDataset[index]
+    del testingDataset[index]
+    # ADD a new dataframe representing the column removed.
+    # To do this for training and testing dataset
 
 columnsToRemove = []
 print(len(trainingDataset))
