@@ -9,44 +9,57 @@ import scipy.stats as stats
 
 header = []
 
-def readDataset (datasetName, getHeaders = false):
-	# Array of arrays. Each array is a column of the dataset
-	dataset = []
+def readDataset (datasetName, getHeaders = False):
+    # Array of arrays. Each array is a column of the dataset
+    dataset = []
 
-	# Reading dataset
-	csvFile   = open(datasetName, 'rb')
-	csvReader = csv.reader(csvFile, delimiter=',')
+    # Reading dataset
+    csvFile   = open(datasetName, 'rb')
+    csvReader = csv.reader(csvFile, delimiter=',')
 
-	# Reading headers (so we know the amount of columns there are)
-	row = csvReader.next()
-	for column in row:
-		dataset.append([])
-        #if (getHeaders):
-                #header.append(column)
+    # Reading headers (so we know the amount of columns there are)
+    row = csvReader.next()
+    for column in row:
+        dataset.append([])
+        if (getHeaders):
+                header.append(column)
 
-	for row in csvReader:
-		col = 0
-		for column in row:
-			dataset[col].append(float(column))
-			col += 1
+    for row in csvReader:
+        col = 0
+        for column in row:
+            dataset[col].append(float(column))
+            col += 1
 
-	return dataset
+    return dataset
 
-trainingDataset = readDataset('dataset_trabalho3/train_file.csv', true)
+trainingDataset = readDataset('dataset_trabalho3/train_file.csv', True)
 testingDataset  = readDataset('dataset_trabalho3/test_file.csv')
 
-print(header)
 # Checking what we can do with each column
-
-
-# 1. If there is any column that doesn`t make any difference (for instance, all the records are filled with the same value)
-#2. If there are any columns that are "indexes"
 columnsToRemove = []
-for column in trainingDataset:
-        size = len(set(column))
-        print(size)
-        if (len(set(column)) < 2 and trainingDataset.index(column) != len(trainingDataset) -1 ):
-                columnsToRemove.append(column)
+indexesToRemove = []
+
+# 1. If there are any 2 columns correlated
+eps = 0.05
+for index1 in xrange(len(trainingDataset)):
+    if (index1 not in indexesToRemove):
+        for index2 in xrange(index1, len(trainingDataset)):
+            if (index2 not in indexesToRemove):
+                if (index1 != index2):
+                    correlation = stats.pearsonr(trainingDataset[index1], trainingDataset[index2])[0]
+                    if (abs(correlation) + eps >= 1):
+                        indexesToRemove.append(index2)
+                        columnsToRemove.append(trainingDataset[index2])
+    print(index1)
+
+# 2. If there is any column that doesn`t make any difference (for instance, all the records are filled with the same value)
+#3. If there are any columns that are "indexes"
+
+# for column in trainingDataset:
+#         size = len(set(column))
+#         print(size)
+#         if (len(set(column)) < 2 and trainingDataset.index(column) != len(trainingDataset) -1 ):
+#                 columnsToRemove.append(column)
 
 for column in columnsToRemove:
         index = trainingDataset.index(column)
@@ -57,18 +70,6 @@ columnsToRemove = []
 print(len(trainingDataset))
 
 
-# 3. If there are any 2 columns correlated
-# eps   = 0.05
-# for column1 in trainingDataset:
-# 	sameColumns = False
-# 	for column2 in trainingDataset:
-# 		# Just checking if the columns are not the same
-# 		if (np.array_equal(column1, column2) == False):
-# 			correlation = stats.pearsonr(column1, column2)[0]
-# 			if (math.fabs(correlation) + eps >= 1):
-# 				print(len(trainingDataset))
-# 				trainingDataset.remove(column2)
-#                 testingDataset.remove(column2)
 # salvar dataset sem correlacao em um novo csv (salvar tambem o de teste)
 # npTrainingDataset = np.array(trainingDataset)
 # npTestingDataset = np.array(testingDataset)
