@@ -94,5 +94,7 @@ ENV/
 .ropeproject
 
 # Text files
-.csv
-.txt
+*.csv
+*.txt
+dataset_trabalho3/
+resultados/
