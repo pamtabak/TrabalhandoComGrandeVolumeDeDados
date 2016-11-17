@@ -90,6 +90,9 @@ ENV/
 # Spyder project settings
 .spyderproject
 
+#mac File System
+.DS_Store
+
 # Rope project settings
 .ropeproject
 
