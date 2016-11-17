@@ -10,7 +10,7 @@ import pandas as pd
 
 header = []
 
-def readDataset (datasetName, getHeaders = False):
+def readDataset (datasetName, numberOfColumns):
     # Array of arrays. Each array is a column of the dataset
     dataset = []
 
@@ -18,12 +18,8 @@ def readDataset (datasetName, getHeaders = False):
     csvFile   = open(datasetName, 'rb')
     csvReader = csv.reader(csvFile, delimiter=',')
 
-    # Reading headers (so we know the amount of columns there are)
-    row = csvReader.next()
-    for column in row:
+    for i in xrange(0,numberOfColumns):
         dataset.append([])
-        if (getHeaders):
-                header.append(column)
 
     for row in csvReader:
         col = 0
@@ -33,53 +29,91 @@ def readDataset (datasetName, getHeaders = False):
 
     return dataset
 
-trainingDataset = readDataset('dataset_trabalho3/train_file.csv', True)
-testingDataset  = readDataset('dataset_trabalho3/test_file.csv')
+trainingDataset = readDataset('dataset_trabalho3/newTrainingDataset.csv', 240)
+testingDataset  = readDataset('dataset_trabalho3/newTestingDataset.csv', 239)
 
-# Checking what we can do with each column
-columnsToRemove = []
-indexesToRemove = []
-headersToRemove = []
 
-# 1. If there are any 2 columns correlated
-eps = 0.05
-for index1 in xrange(len(trainingDataset)):
-    if (index1 not in indexesToRemove):
-        for index2 in xrange(index1, len(trainingDataset)):
-            if (index1 != index2):
-                if (index2 not in indexesToRemove):
-                    correlation = stats.pearsonr(trainingDataset[index1], trainingDataset[index2])[0]
-                    if (abs(correlation) + eps >= 1):
-                        indexesToRemove.append(index2)
-                        columnsToRemove.append(trainingDataset[index2])
-                        headersToRemove.append(header[index2])
-    print(index1)
 
-for column in columnsToRemove:
-    index = trainingDataset.index(column)
-    trainingDataset.remove(column)
-    del testingDataset[index]
+def removeCorrelation (eps = 0.05):
+    # Checking what we can do with each column
+    columnsToRemove = []
+    indexesToRemove = []
+    headersToRemove = []
 
-for h in headersToRemove:
-    header.remove(h)
+    # 1. If there are any 2 columns correlated
+    for index1 in xrange(len(trainingDataset)):
+        if (index1 not in indexesToRemove):
+            for index2 in xrange(index1, len(trainingDataset)):
+                if (index1 != index2):
+                    if (index2 not in indexesToRemove):
+                        correlation = stats.pearsonr(trainingDataset[index1], trainingDataset[index2])[0]
+                        if (abs(correlation) + eps >= 1):
+                            indexesToRemove.append(index2)
+                            columnsToRemove.append(trainingDataset[index2])
+                            headersToRemove.append(header[index2])
+        print(index1)
 
-#2. If there are any columns that are "indexes"
-hashingTrickColumns = []
-# Hashing Trick (look for columns that have less than 50 unique values on it)
-uniqueValues = 2
-for column in trainingDataset:
+    for column in columnsToRemove:
+        index = trainingDataset.index(column)
+        trainingDataset.remove(column)
+        del testingDataset[index]
+
+    for h in headersToRemove:
+        header.remove(h)
+
+def createColumn():
+    newHeader = []
+    for col in xrange(0, len(trainingDataset)):
+        newHeader.append("A" + str(col));
+    return newHeader;
+
+def hashingTrick(newHeader, uniqueValues = 50):
+    print("dentro da funcao hashing trick")
+    #If there are any columns that are "indexes"
+    hashingTrickColumns = [] #name of the column that should have a hashing trick operation
+    # Hashing Trick (look for columns that have less than 50 unique values on it)
+    for column in xrange(0, len(trainingDataset) - 1):
         # We need to be sure we won`t remove the TARGET column
-        if (len(set(column)) < uniqueValues and trainingDataset.index(column) != len(trainingDataset) - 1):
-            hashingTrickColumns.append(column)
+        if (len(set(trainingDataset[column])) < uniqueValues):
+            hashingTrickColumns.append(newHeader[column])
+
+    print(hashingTrickColumns)
+
+    trainingLines = len(trainingDataset[0])
+    testingLines  = len(testingDataset[0])
+
+    mergedDataset = np.concatenate((trainingDataset[:-1], testingDataset), axis=1)
+
+    df = pd.DataFrame(data=np.transpose(mergedDataset), columns=newHeader[:-1])
+
+    for column in hashingTrickColumns:
+        just_dummies = pd.get_dummies(df[column])
+        df = pd.concat([df, just_dummies], axis=1)
+        df.drop([column], inplace=True, axis=1)
+
+    # Cant concat because the second parameter is not a pandas dataframe
+    # trainingDf = pd.concat([df[0:trainingLines], trainingDataset[-1]], axis = 1)
+    trainingDf = pd.concat([df[0:trainingLines],pd.DataFrame(trainingDataset[-1], columns=["target"])], axis=1)
+    testingDf  = df[trainingLines:]
+
+    print(len(trainingDf.columns))
+    print(len(testingDf.columns))
+
+    trainingDf.to_csv('resultados/trainingWithHashTrick.csv', index = False, header= False)
+    testingDf.to_csv('resultados/testingWithHashTrick.csv', index = False, header= False)
+
+
+#removeCorrelation()
+newHeader = createColumn()
+hashingTrick(newHeader)
 
 # transposeTrainingDataset = np.transpose(trainingDataset).tolist()
 # trainingDf               = pd.DataFrame(data=transposeTrainingDataset, columns=header)
 # testingDf  = pd.DataFrame(data=testingDataset,  columns=header[:-1])
 
-
 # salvar dataset sem correlacao em um novo csv (salvar tambem o de teste)
-np.savetxt('newTrainingDataset.csv', np.transpose(trainingDataset), delimiter=",")
-np.savetxt('newTestingDataset.csv',  np.transpose(testingDataset),  delimiter=",")
+# np.savetxt('newTrainingDataset.csv', np.transpose(trainingDataset), delimiter=",")
+# np.savetxt('newTestingDataset.csv',  np.transpose(testingDataset),  delimiter=",")
 
 # rodar processo de classificacao nos dois datasets com um cross-validation com k pelo menos 50
 # ver se melhorou

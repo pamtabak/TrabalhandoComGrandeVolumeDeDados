@@ -23,8 +23,8 @@ def readDataset (datasetName, numberOfColumns):
 
     return dataset
 
-trainingDataset = readDataset('dataset_trabalho3/newTrainingDataset.csv', 240)
-testingDataset  = readDataset('dataset_trabalho3/newTestingDataset.csv', 239)
+trainingDataset = readDataset('resultados/trainingWithHashTrick.csv', 1477)
+testingDataset  = readDataset('resultados/testingWithHashTrick.csv', 1476)
 
 target = trainingDataset[-1:][0]
 train  = trainingDataset[0:len(trainingDataset)-1]
