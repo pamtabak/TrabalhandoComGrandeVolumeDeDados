@@ -10,13 +10,16 @@ import pandas as pd
 
 header = []
 
-def readDataset (datasetName, numberOfColumns):
+def readDataset (datasetName, numberOfColumns, removeHeader = False):
     # Array of arrays. Each array is a column of the dataset
     dataset = []
 
     # Reading dataset
     csvFile   = open(datasetName, 'rb')
     csvReader = csv.reader(csvFile, delimiter=',')
+
+    if (removeHeader):
+        csvReader.next()
 
     for i in xrange(0,numberOfColumns):
         dataset.append([])
@@ -31,8 +34,6 @@ def readDataset (datasetName, numberOfColumns):
 
 trainingDataset = readDataset('dataset_trabalho3/newTrainingDataset.csv', 240)
 testingDataset  = readDataset('dataset_trabalho3/newTestingDataset.csv', 239)
-
-
 
 def removeCorrelation (eps = 0.05):
     # Checking what we can do with each column
@@ -106,14 +107,6 @@ def hashingTrick(newHeader, uniqueValues = 50):
 #removeCorrelation()
 newHeader = createColumn()
 hashingTrick(newHeader)
-
-# transposeTrainingDataset = np.transpose(trainingDataset).tolist()
-# trainingDf               = pd.DataFrame(data=transposeTrainingDataset, columns=header)
-# testingDf  = pd.DataFrame(data=testingDataset,  columns=header[:-1])
-
-# salvar dataset sem correlacao em um novo csv (salvar tambem o de teste)
-# np.savetxt('newTrainingDataset.csv', np.transpose(trainingDataset), delimiter=",")
-# np.savetxt('newTestingDataset.csv',  np.transpose(testingDataset),  delimiter=",")
 
 # rodar processo de classificacao nos dois datasets com um cross-validation com k pelo menos 50
 # ver se melhorou
