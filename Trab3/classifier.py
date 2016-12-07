@@ -68,7 +68,7 @@ def classify(args, performCV = False):
     # result = np.transpose(alg.predict_proba(np.transpose(test)))[1]
     cv_score = cross_val_score(alg, np.transpose(train), target, cv=5, scoring='roc_auc')
     print "CV Score : Mean - %.7g | Std - %.7g | Min - %.7g | Max - %.7g" % (np.mean(cv_score),np.std(cv_score),np.min(cv_score),np.max(cv_score))
-    return 1 - cv_score
+    return 1 - cv_score.mean()
 
 def simulatedAnnealing(args, t0, niter, nper, n_sucess_iter, alpha) :
     print "incio da funcao"
@@ -88,7 +88,7 @@ def simulatedAnnealing(args, t0, niter, nper, n_sucess_iter, alpha) :
             fnew = classify(si)
             deltaFi = fnew - f
             print deltaFi
-            if(deltaFi <= 0 | math.exp(-deltaFi / t ) > random.rand(0,1)):
+            if(deltaFi <= 0 or math.exp(- deltaFi / t ) > random.uniform(0,1)):
                 s = si
                 nSucesso = nSucesso + 1
                 f = fnew
