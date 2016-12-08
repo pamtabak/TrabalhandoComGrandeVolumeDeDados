@@ -43,6 +43,12 @@ def removeCorrelation (eps = 0.05):
 
     # 1. If there are any 2 columns correlated
     for index1 in xrange(len(testingDataset)):
+        if (len(set(trainingDataset[index1])) == 1):
+            print("all values are the same")
+            indexesToRemove.append(index1)
+            columnsToRemove.append(trainingDataset[index1])
+            headersToRemove.append(header[index1])
+            continue
         if (index1 not in indexesToRemove):
             for index2 in xrange(index1, len(testingDataset)):
                 if (index1 != index2):
@@ -94,33 +100,22 @@ def hashingTrick(newHeader, uniqueValues = 50):
 
     # Cant concat because the second parameter is not a pandas dataframe
     # trainingDf = pd.concat([df[0:trainingLines], trainingDataset[-1]], axis = 1)
-    trainingDf = pd.concat([df[0:trainingLines],pd.DataFrame(trainingDataset[-1], columns=["target"])], axis=1)
+    trainingDf = pd.concat([df[0:trainingLines],pd.DataFrame(trainingDataset[-1], columns=["TARGET"])], axis=1)
     testingDf  = df[trainingLines:]
 
     print(len(trainingDf.columns))
     print(len(testingDf.columns))
 
-    trainingDf.to_csv('resultados/trainingWithHashTrick.csv', index = False, header= False)
-    testingDf.to_csv('resultados/testingWithHashTrick.csv', index = False, header= False)
-
+    trainingDf.to_csv('dataset_trabalho3/trainingWithHashTrick.csv', index = False, header=False)
+    testingDf.to_csv('dataset_trabalho3/testingWithHashTrick.csv', index = False, header=False)
 
 #############################################################################
-trainingDataset = readDataset('dataset_trabalho3/train_file.csv', 370, removeHeader=True)
-testingDataset  = readDataset('dataset_trabalho3/test_file.csv', 369, removeHeader=True)
+# Remove Correlation
+#############################################################################
+trainingDataset = readDataset('dataset_trabalho3/train_file.csv', 370, removeHeader=True)testingDataset  = readDataset('dataset_trabalho3/test_file.csv', 369, removeHeader=True)
+removeCorrelation(eps=0.01)
 
-print(header)
-
-removeCorrelation()
-newTrainingDataset = np.insert(trainingDataset,0,header, axis=1)
-newTestingDataset  = np.insert(testingDataset,0,header[-1:], axis=1)
-
-# newTrainingDataset = header + trainingDataset
-# newTestingDataset  = header[:-1] + testingDataset
-print(len(newTrainingDataset))
-print(len(newTestingDataset))
-np.savetxt('dataset_trabalho3/train_without_correlation.csv', newTrainingDataset, fmt="%f", delimiter=",")
-np.savetxt('dataset_trabalho3/test_without_correlation.csv', newTestingDataset, fmt="%f", delimiter=",")
-
-# newHeader = createColumn()
-# hashingTrick(newHeader)
-
+print("finished removing correlation")
+np.savetxt('dataset_trabalho3/train_without_correlation.csv', np.transpose(trainingDataset), fmt="%f", delimiter=",")
+np.savetxt('dataset_trabalho3/test_without_correlation.csv', np.transpose(testingDataset), fmt="%f", delimiter=",")
+np.savetxt('dataset_trabalho3/header_without_correlation.csv', header, fmt="%s", delimiter=",")
