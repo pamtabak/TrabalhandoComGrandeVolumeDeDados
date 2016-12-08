@@ -6,6 +6,7 @@ from   sklearn.model_selection import cross_val_score
 from   sklearn.neighbors       import KNeighborsClassifier
 from   scipy.optimize          import basinhopping
 import numpy                   as np
+import xgboost                 as xgb
 import csv
 import random
 import math
@@ -62,13 +63,14 @@ def classify(args, performCV = False):
     _n_estimators  = args[0]
     _learning_rate = args[1]
     _max_depth     = args[2]
-    alg = GradientBoostingClassifier(n_estimators=int(_n_estimators), learning_rate=float(_learning_rate),max_depth=int(_max_depth))
+    alg            = GradientBoostingClassifier(n_estimators=int(_n_estimators), learning_rate=float(_learning_rate),max_depth=int(_max_depth))
     alg.fit(np.transpose(train), target)
 
     # result = np.transpose(alg.predict_proba(np.transpose(test)))[1]
     cv_score = cross_val_score(alg, np.transpose(train), target, cv=5, scoring='roc_auc')
     print "CV Score : Mean - %.7g | Std - %.7g | Min - %.7g | Max - %.7g" % (np.mean(cv_score),np.std(cv_score),np.min(cv_score),np.max(cv_score))
-    return 1 - cv_score.mean()
+    return 1 - cv_score.mean()    
+
 
 def simulatedAnnealing(args, t0, niter, nper, n_sucess_iter, alpha) :
     print "incio da funcao"
@@ -118,9 +120,10 @@ test   = testingDataset
 #n_estimators = [100,1000]
 
 #result =classify([200,0.1,3])
-x0 = np.array([200, 0.1, 3])
 # ret = basinhopping(classify, x0, minimizer_kwargs={"method":"BFGS"}, take_step=perturb, niter=20)
-simulatedAnnealing(x0, 1000, 20, 100, 20, 0.5)
+
+#x0 = np.array([200, 0.1, 3])
+#simulatedAnnealing(x0, 1000, 20, 100, 20, 0.5)
 
 # print perturb(x0)
 

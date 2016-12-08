@@ -19,7 +19,10 @@ def readDataset (datasetName, numberOfColumns, removeHeader = False):
     csvReader = csv.reader(csvFile, delimiter=',')
 
     if (removeHeader):
-        csvReader.next()
+        row = csvReader.next()
+        if (len(header) == 0):
+            for column in row:
+                header.append(column)
 
     for i in xrange(0,numberOfColumns):
         dataset.append([])
@@ -32,9 +35,6 @@ def readDataset (datasetName, numberOfColumns, removeHeader = False):
 
     return dataset
 
-trainingDataset = readDataset('dataset_trabalho3/newTrainingDataset.csv', 240)
-testingDataset  = readDataset('dataset_trabalho3/newTestingDataset.csv', 239)
-
 def removeCorrelation (eps = 0.05):
     # Checking what we can do with each column
     columnsToRemove = []
@@ -42,9 +42,9 @@ def removeCorrelation (eps = 0.05):
     headersToRemove = []
 
     # 1. If there are any 2 columns correlated
-    for index1 in xrange(len(trainingDataset)):
+    for index1 in xrange(len(testingDataset)):
         if (index1 not in indexesToRemove):
-            for index2 in xrange(index1, len(trainingDataset)):
+            for index2 in xrange(index1, len(testingDataset)):
                 if (index1 != index2):
                     if (index2 not in indexesToRemove):
                         correlation = stats.pearsonr(trainingDataset[index1], trainingDataset[index2])[0]
@@ -104,9 +104,23 @@ def hashingTrick(newHeader, uniqueValues = 50):
     testingDf.to_csv('resultados/testingWithHashTrick.csv', index = False, header= False)
 
 
-#removeCorrelation()
-newHeader = createColumn()
-hashingTrick(newHeader)
+#############################################################################
+trainingDataset = readDataset('dataset_trabalho3/train_file.csv', 370, removeHeader=True)
+testingDataset  = readDataset('dataset_trabalho3/test_file.csv', 369, removeHeader=True)
 
-# rodar processo de classificacao nos dois datasets com um cross-validation com k pelo menos 50
-# ver se melhorou
+print(header)
+
+removeCorrelation()
+newTrainingDataset = np.insert(trainingDataset,0,header, axis=1)
+newTestingDataset  = np.insert(testingDataset,0,header[-1:], axis=1)
+
+# newTrainingDataset = header + trainingDataset
+# newTestingDataset  = header[:-1] + testingDataset
+print(len(newTrainingDataset))
+print(len(newTestingDataset))
+np.savetxt('dataset_trabalho3/train_without_correlation.csv', newTrainingDataset, fmt="%f", delimiter=",")
+np.savetxt('dataset_trabalho3/test_without_correlation.csv', newTestingDataset, fmt="%f", delimiter=",")
+
+# newHeader = createColumn()
+# hashingTrick(newHeader)
+
